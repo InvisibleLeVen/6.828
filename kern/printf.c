@@ -21,6 +21,12 @@ vcprintf(const char *fmt, va_list ap)
 	vprintfmt((void*)putch, &cnt, fmt, ap);
 	return cnt;
 }
+int vcprintf_col(COLOR color,const char *fmt,va_list ap)
+{
+    int cnt = 0;
+    vprintfmt_col((void*)putch,&cnt,color,fmt,ap);
+    return cnt;
+}
 
 int
 cprintf(const char *fmt, ...)
@@ -35,3 +41,13 @@ cprintf(const char *fmt, ...)
 	return cnt;
 }
 
+int
+cprintf_col(COLOR color,const char *fmt,...)
+{
+    va_list ap;
+    int cnt;
+    va_start(ap,fmt);
+    cnt = vcprintf_col(color,fmt,ap);
+    va_end(ap);
+    return cnt;
+}

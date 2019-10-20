@@ -20,6 +20,16 @@ test_backtrace(int x)
 }
 
 void
+testprintf(){
+    //int x = 1, y = 3, z = 4;
+    //cprintf("x %d, y %x, z %d\n", x, y, z);
+    cprintf_col(BACKGROUND_COL_BLACK|FOREGROUND_COL_RED,"Wow,this is my first system!!!");
+   // unsigned int i = 0x00646c72;
+   // cprintf("H%x Wo%s", 57616, &i);
+   //cprintf("x=%d y=%d", 3);
+}
+
+void
 i386_init(void)
 {
 	extern char edata[], end[];
@@ -32,7 +42,8 @@ i386_init(void)
 	// Initialize the console.
 	// Can't call cprintf until after we do this!
 	cons_init();
-
+    
+    //testprintf();
 	cprintf("6828 decimal is %o octal!\n", 6828);
 
 	// Test the stack backtrace function (lab 1 only)

@@ -24,6 +24,7 @@ struct Command {
 static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
+    { "backtrace","Display backtrace about the function", mon_backtrace },
 };
 
 /***** Implementations of basic kernel monitor commands *****/
@@ -57,7 +58,39 @@ mon_kerninfo(int argc, char **argv, struct Trapframe *tf)
 int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
-	// Your code here.
+    int32_t *addr = (int32_t*)(&tf);
+    //cprintf("addr:%x\n",addr);
+    int32_t *oldebp = (int32_t*)(*(addr-4));
+    int32_t *newebp = addr-4;
+    int32_t *eip = (int32_t*)*(addr-3);
+    bool control = 1;
+    //cprintf("%x\n",addr-1);
+    //cprintf("oldebp:%x\teip:%x\t lastarg:%x\t secondlast:%x\t thirdlast:%x\n"
+     //       ,oldebp,eip,*lastarg,*(lastarg-1),*(lastarg-2));
+    struct Eipdebuginfo info = {0};
+    cprintf("Stack backtrace:\n");
+    while(control){
+        if(oldebp == 0)
+            control = 0;
+        int id =  debuginfo_eip((uintptr_t)eip,&info);
+        char *fn_name = (char*)info.eip_fn_name;
+        char *loc = strchr(fn_name,':');
+        int n = loc-fn_name;
+        //cprintf("n:%d\n",n);
+        //cprintf("debuginfo_eip output:%d\n\n",id);
+        cprintf("ebp %08x eip %08x args %08x %08x %08x %08x %08x\n"
+                ,newebp,eip,*(newebp+2),*(newebp+3),*(newebp+4),*(newebp+5),(newebp+6));
+        cprintf("\t%s:%d: %.*s",info.eip_file,info.eip_line,n,fn_name);
+        if(eip-info.eip_fn_addr>0)
+            cprintf("+");
+        cprintf("%d\n",(uintptr_t)eip-info.eip_fn_addr);
+        newebp = oldebp;
+        oldebp = (int32_t*)(*newebp);
+        eip = (int32_t*)*(newebp + 1);
+        //lastarg = newebp - 2;
+
+    }
+	// Your code here.*/
 	return 0;
 }
 

@@ -2,7 +2,6 @@
 #include <inc/string.h>
 #include <inc/memlayout.h>
 #include <inc/assert.h>
-
 #include <kern/kdebug.h>
 
 extern const struct Stab __STAB_BEGIN__[];	// Beginning of stabs table
@@ -87,7 +86,12 @@ stab_binsearch(const struct Stab *stabs, int *region_left, int *region_right,
 		// find rightmost region containing 'addr'
 		for (l = *region_right;
 		     l > *region_left && stabs[l].n_type != type;
-		     l--)
+		     l--){
+            //int tmp = l;
+            //if( stabs[--tmp].n_value < addr)
+            //    break;
+            
+        }
 			/* do nothing */;
 		*region_left = l;
 	}
@@ -179,7 +183,12 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 	//	Look at the STABS documentation and <inc/stab.h> to find
 	//	which one.
 	// Your code here.
-
+ //   lline = lfun;
+ //   rline = rfun;
+    stab_binsearch(stabs,&lline,&rline,N_SLINE,addr);
+    if(lline>rline)
+        return -1;
+    info->eip_line = stabs[lline].n_desc; 
 
 	// Search backwards from the line number for the relevant filename
 	// stab.
